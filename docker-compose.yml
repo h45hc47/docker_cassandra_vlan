@@ -1,0 +1,61 @@
+ersion: '3.8'
+
+services:
+  cassandra1:
+    build:
+      context: .
+      dockerfile: Dockerfile.cassandra.ssh
+    container_name: cassandra1
+    networks:
+      cassandra-net:
+        ipv4_address: 192.168.1.200
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=RACK1
+      - CASSANDRA_BROADCAST_ADDRESS=192.168.1.200
+      - CASSANDRA_LISTEN_ADDRESS=192.168.1.200
+      - CASSANDRA_RPC_ADDRESS=192.168.1.200
+    volumes:
+      - cassandra1-data:/var/lib/cassandra
+
+  cassandra2:
+    image: cassandra:5.0.5
+    container_name: cassandra2
+    networks:
+      cassandra-net:
+        ipv4_address: 192.168.1.201
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=RACK1
+      - CASSANDRA_SEEDS=192.168.1.200
+      - CASSANDRA_BROADCAST_ADDRESS=192.168.1.201
+      - CASSANDRA_LISTEN_ADDRESS=192.168.1.201
+    volumes:
+      - cassandra2-data:/var/lib/cassandra
+
+  cassandra3:
+    image: cassandra:5.0.5
+    container_name: cassandra3
+    networks:
+      cassandra-net:
+        ipv4_address: 192.168.1.202
+    environment:
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_DC=DC1
+      - CASSANDRA_RACK=RACK1
+      - CASSANDRA_SEEDS=192.168.1.200
+      - CASSANDRA_BROADCAST_ADDRESS=192.168.1.202
+      - CASSANDRA_LISTEN_ADDRESS=192.168.1.202
+    volumes:
+      - cassandra3-data:/var/lib/cassandra
+
+volumes:
+  cassandra1-data:
+  cassandra2-data:
+  cassandra3-data:
+
+networks:
+  cassandra-net:
+    external: true
