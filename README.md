@@ -195,6 +195,9 @@ EXPOSE 22 7000 7001 7199 9042
 
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 ```
+Правильней было бы вынести копирование сертификатов в отдельный entrypoint, который бы копировал их при запуске кластера, а не при сборке контейнера. 
+<br/>
+
 Создаём docker-compose.yml
 ```yaml
 ersion: '3.8'
