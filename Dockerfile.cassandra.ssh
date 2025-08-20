@@ -1,0 +1,31 @@
+ROM cassandra:5.0.5
+
+# Устанавливаем openssh-server и supervisor; удаляем ненужные больше списки apt
+RUN apt-get update && apt-get install -y openssh-server supervisor && \
+    rm -rf /var/lib/apt/lists/*
+
+# Подготовка директорий
+RUN mkdir -p /var/run/sshd /root/.ssh /var/log/supervisor && \
+    chmod 700 /root/.ssh && chown root:root /root/.ssh && \
+    chmod 777 /var/lib/cassandra /var/log/cassandra && chown -R cassandra:cassandra /var/lib/cassandra /var/log/cassandra
+
+# Копируем публичный ключ
+COPY public_keys/ /etc/ssh/public_keys/
+RUN cat /etc/ssh/public_keys/*.pub > /root/.ssh/authorized_keys
+# Права и владелец для authorized_keys
+RUN chmod 600 /root/.ssh/authorized_keys && chown root:root /root/.ssh/authorized_keys
+
+# Запрещаем парольную аутентификацию по SSH
+RUN sed -i 's/^#PasswordAuthentication.*$/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+    sed -i 's/^#PubkeyAuthentication.*$/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^#PermitRootLogin.*$/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config && \
+    sed -i 's/^#AuthorizedKeysFile.*$/AuthorizedKeysFile \/root\/.ssh\/authorized_keys/' /etc/ssh/sshd_config
+
+RUN cat /etc/ssh/sshd_config
+# Копируем конфиг supervisord
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# SSH — 22, cassandra — 7000 7001 7199 9042
+EXPOSE 22 7000 7001 7199 9042
+
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
