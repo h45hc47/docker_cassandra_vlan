@@ -125,7 +125,7 @@ docker network ls
 ```
 <img width="475" height="130" alt="изображение" src="https://github.com/user-attachments/assets/41f6e1a3-4c58-42f1-a1cd-fe3f261a93d6" /><br/>
 
-Так как хост не «видит» контейнеры на macvlan. Чтобы можно было SSH с 192.168.1.197 подключаться к 192.168.1.200-202, создадим виртуальный интерфейс на хосте:
+Так как хост не «видит» контейнеры на ipvlan. Чтобы можно было SSH с 192.168.1.197 подключаться к 192.168.1.200-202, создадим виртуальный интерфейс на хосте:
 ```bash
 sudo ip link add ipvlan0 link enp2s1 type ipvlan mode l2
 sudo ip addr add 192.168.1.199/24 dev ipvlan0
